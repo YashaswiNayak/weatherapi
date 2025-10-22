@@ -1,0 +1,33 @@
+server:
+  port:8080
+
+spring:
+  application:
+    name:weatherapi
+  config:
+    activate:
+      on-profile: dev
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:health,info
+  endpoint:
+    health:
+      show-details:when-authorized
+
+logging:
+  level:
+    com.yashaswi.weatherapi: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+
+

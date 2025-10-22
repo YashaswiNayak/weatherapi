@@ -1,0 +1,9 @@
+logging:
+  level:
+    root: INFO
+    com.yashaswi.weatherapi: DEBUG
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
