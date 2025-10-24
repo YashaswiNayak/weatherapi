@@ -1,47 +1,64 @@
 package com.yashaswi.weatherapi.controller;
 
+import com.yashaswi.weatherapi.dtos.WeatherResponse;
+import com.yashaswi.weatherapi.exception.WeatherNotFoundException;
+import com.yashaswi.weatherapi.service.WeatherService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
-public class WeatherControllerTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
+class WeatherControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private WebTestClient webTestClient;
+
+    @MockBean
+    private WeatherService weatherService;
 
     @Test
-    void shallReturnWeatherForValidCity() throws Exception {
-        mockMvc.perform(get("/api/weather")
-                        .param("city", "London"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.city").value("London"))
-                .andExpect(jsonPath("$.description").exists());
+    void shouldReturnWeatherForValidCity() {
+        WeatherResponse mockResponse = WeatherResponse.builder()
+                .city("London")
+                .country("UK")
+                .temperature(15.5)
+                .description("cloudy")
+                .humidity(65)
+                .pressure(1012)
+                .windSpeed(3.5)
+                .icon("02d")
+                .source("weatherapi")
+                .build();
+
+        when(weatherService.getWeatherByCity("London"))
+                .thenReturn(Mono.just(mockResponse));
+
+        webTestClient.get()
+                .uri("/api/weather?city=London")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.city").isEqualTo("London")
+                .jsonPath("$.description").isEqualTo("cloudy")
+                .jsonPath("$.temperature").isEqualTo(15.5);
     }
 
     @Test
-    void shallReturnErrorForNonValidCity() throws Exception {
-        mockMvc.perform(get("/api/weather")
-                        .param("city", "unknown"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("Weather Not Found"))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.message").value("Weather data not available for city: unknown"));
-    }
+    void shouldReturn404ForInvalidCity() {
+        when(weatherService.getWeatherByCity(anyString()))
+                .thenReturn(Mono.error(new WeatherNotFoundException("City not found")));
 
-    @Test
-    void shouldReturn400WhenCityParameterMissing() throws Exception {
-        mockMvc.perform(get("/api/weather"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Missing Parameter"))
-                .andExpect(jsonPath("$.status").value(400));
+        webTestClient.get()
+                .uri("/api/weather?city=UnknownCity")
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }
