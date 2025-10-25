@@ -1,0 +1,11 @@
+weather:
+  api:
+    api-key: ${WEATHER_API_KEY}
+    timeout: 15s
+    cache:
+      ttl: 6h
+
+logging:
+  level:
+    root: INFO
+    com.yashaswi.weatherapi: INFO
