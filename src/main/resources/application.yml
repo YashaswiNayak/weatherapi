@@ -1,33 +1,30 @@
-server:
-  port:8080
-
 spring:
   application:
-    name:weatherapi
-  config:
-    activate:
-      on-profile: dev
-  devtools:
-    restart:
-      enabled: true
-    livereload:
-      enabled: true
+    name: weatherapi
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+# Common configuration for all profiles
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
 management:
   endpoints:
     web:
       exposure:
-        include:health,info
+        include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details:when-authorized
+      show-details: when-authorized
 
-logging:
-  level:
-    com.yashaswi.weatherapi: DEBUG
-    org.springframework.web: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-
-
-
+# Weather API configuration (defaults)
+weather:
+  api:
+    base-url: https://api.openweathermap.org/data/2.5
+    timeout: 10s
+    retry-attempts: 3
+    cache:
+      ttl: 12h
+      key-prefix: weather
+      enabled: true

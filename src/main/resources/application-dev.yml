@@ -1,14 +1,15 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+
+weather:
+  api:
+    api-key: ${WEATHER_API_KEY:your-dev-api-key-here}
+    timeout: 30s  # Longer timeout for debugging
+
 logging:
   level:
     root: INFO
     com.yashaswi.weatherapi: DEBUG
-
-server:
-  error:
-    include-message: always
-    include-binding-errors: always
-
-weather:
-  api:
-    apiKey: a4bd7cc900858e35440ade7c8c3adc4b
-    baseUrl: https://api.openweathermap.org/data/2.5
+    org.springframework.web: DEBUG
