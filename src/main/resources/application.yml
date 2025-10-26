@@ -24,7 +24,10 @@ management:
         include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
+  metrics:
+    enable:
+      all: true
 
 # Weather API configuration (defaults)
 weather:
