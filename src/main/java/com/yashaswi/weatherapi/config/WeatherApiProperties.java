@@ -14,33 +14,13 @@ import java.time.Duration;
 @Data
 @Validated
 public class WeatherApiProperties {
-
-    /**
-     * OpenWeatherMap API key (required)
-     */
     @NotBlank(message = "Weather API key must be configured")
     private String apiKey;
-
-    /**
-     * Base URL for OpenWeatherMap API
-     */
     @NotBlank(message = "Weather API base URL must be configured")
     private String baseUrl = "https://api.openweathermap.org/data/2.5";
-
-    /**
-     * Request timeout duration
-     */
     @NotNull
     private Duration timeout = Duration.ofSeconds(10);
-
-    /**
-     * Number of retry attempts for failed requests
-     */
     private int retryAttempts = 3;
-
-    /**
-     * Cache configuration
-     */
     private Cache cache = new Cache();
 
     @Data
