@@ -5,6 +5,7 @@ import com.yashaswi.weatherapi.dtos.OpenWeatherMapResponse;
 import com.yashaswi.weatherapi.dtos.WeatherResponse;
 import com.yashaswi.weatherapi.exception.WeatherNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -21,6 +22,7 @@ public class WeatherService {
         this.webClient = webClient.baseUrl(weatherApiProperties.getBaseUrl()).build();
     }
 
+    @Cacheable(value = "weather", key = "#city.toLowerCase()", unless = "#result == null")
     public Mono<WeatherResponse> getWeatherByCity(String city) {
         String uri = String.format("/weather?q=%s&appid=%s&units=metric", city, weatherApiProperties.getApiKey());
 
@@ -35,15 +37,16 @@ public class WeatherService {
                 })
                 .doOnError(ex -> log.error("Error fetching weather for city {}", city, ex));
     }
+
     private WeatherResponse mapToWeatherResponse(OpenWeatherMapResponse apiResponse) {
         return WeatherResponse.builder()
                 .city(apiResponse.getName())
                 .temperature(apiResponse.getMain().getTemp())
-                .description(apiResponse.getWeather().get(0).getDescription())
+                .description(apiResponse.getWeather().getFirst().getDescription())
                 .humidity(apiResponse.getMain().getHumidity())
                 .windSpeed(apiResponse.getWind().getSpeed())
                 .pressure(apiResponse.getMain().getPressure())
-                .icon(apiResponse.getWeather().get(0).getIcon())
+                .icon(apiResponse.getWeather().getFirst().getIcon())
                 .build();
     }
 

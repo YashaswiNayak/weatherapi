@@ -1,10 +1,12 @@
 package com.yashaswi.weatherapi.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OpenWeatherMapResponse {
     private List<Weather> weather;
     private Main main;
@@ -12,6 +14,7 @@ public class OpenWeatherMapResponse {
     private String name;
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Weather {
         private String main;
         private String description;
@@ -19,6 +22,7 @@ public class OpenWeatherMapResponse {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Main {
         private Double temp;
         private Integer humidity;
@@ -26,6 +30,7 @@ public class OpenWeatherMapResponse {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Wind {
         private Double speed;
     }

@@ -1,0 +1,20 @@
+services:
+  weatherapi:
+    build: .
+    container_name: weatherapi
+    ports:
+      - "8080:8080"
+    environment:
+      - WEATHER_API_KEY=${WEATHER_API_KEY}
+      - SPRING_PROFILES_ACTIVE=dev
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
