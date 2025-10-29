@@ -1,13 +1,12 @@
 spring:
-  docker:
-    compose:
-      enabled: false
 
 weather:
   api:
-    api-key: ${WEATHER_API_KEY:your-dev-api-key-here}
-    timeout: 30s  # Longer timeout for debugging
+    api-key: ${WEATHER_API_KEY:your-dev-api-key-here}  # This reads from .env
+    timeout: 30s
+    # ... other weather properties
 
+# Logging (if needed)
 logging:
   level:
     root: INFO

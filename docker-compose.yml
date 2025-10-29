@@ -1,55 +1,126 @@
 services:
+  # Spring Boot Weather API
   weatherapi:
     build: .
     container_name: weatherapi
     ports:
       - "8080:8080"
+    env_file:
+      - .env  # ✅ Add this line to load .env file
     environment:
-      - WEATHER_API_KEY=${WEATHER_API_KEY}
-      - SPRING_PROFILES_ACTIVE=prod
-      - REDIS_HOST=redis
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - WEATHER_API_KEY=${WEATHER_API_KEY}  # ✅ Pass the API key
     depends_on:
-      - redis
+      - redis-master
+      - sentinel-1
+      - sentinel-2
+      - sentinel-3
     networks:
-      - weather-network
+      - redis-network
 
-  redis:
-    image: redis:7-alpine
-    container_name: redis
+  # Redis Master
+  redis-master:
+    image: redis:latest
+    container_name: redis-master
     ports:
       - "6379:6379"
+    command: redis-server --protected-mode no
     networks:
-      - weather-network
+      - redis-network
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
+  # Redis Slave 1
+  redis-slave-1:
+    image: redis:latest
+    container_name: redis-slave-1
     ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
+      - "6380:6379"
+    command: redis-server --protected-mode no --slaveof redis-master 6379
     depends_on:
-      - weatherapi
+      - redis-master
     networks:
-      - weather-network
+      - redis-network
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
+  # Redis Slave 2
+  redis-slave-2:
+    image: redis:latest
+    container_name: redis-slave-2
     ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_INSTALL_PLUGINS=
+      - "6381:6379"
+    command: redis-server --protected-mode no --slaveof redis-master 6379
     depends_on:
-      - prometheus
+      - redis-master
     networks:
-      - weather-network
+      - redis-network
+
+  # Sentinel 1
+  sentinel-1:
+    image: redis:latest
+    container_name: sentinel-1
+    ports:
+      - "26379:26379"
+    command: >
+      bash -c "echo 'port 26379' > /tmp/sentinel.conf &&
+               echo 'dir /tmp' >> /tmp/sentinel.conf &&
+               echo 'sentinel monitor mymaster redis-master 6379 2' >> /tmp/sentinel.conf &&
+               echo 'sentinel down-after-milliseconds mymaster 5000' >> /tmp/sentinel.conf &&
+               echo 'sentinel parallel-syncs mymaster 1' >> /tmp/sentinel.conf &&
+               echo 'sentinel failover-timeout mymaster 10000' >> /tmp/sentinel.conf &&
+               echo 'sentinel resolve-hostnames yes' >> /tmp/sentinel.conf &&
+               echo 'sentinel announce-hostnames yes' >> /tmp/sentinel.conf &&
+               redis-sentinel /tmp/sentinel.conf"
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    networks:
+      - redis-network
+
+  # Sentinel 2
+  sentinel-2:
+    image: redis:latest
+    container_name: sentinel-2
+    ports:
+      - "26380:26379"
+    command: >
+      bash -c "echo 'port 26379' > /tmp/sentinel.conf &&
+               echo 'dir /tmp' >> /tmp/sentinel.conf &&
+               echo 'sentinel monitor mymaster redis-master 6379 2' >> /tmp/sentinel.conf &&
+               echo 'sentinel down-after-milliseconds mymaster 5000' >> /tmp/sentinel.conf &&
+               echo 'sentinel parallel-syncs mymaster 1' >> /tmp/sentinel.conf &&
+               echo 'sentinel failover-timeout mymaster 10000' >> /tmp/sentinel.conf &&
+               echo 'sentinel resolve-hostnames yes' >> /tmp/sentinel.conf &&
+               echo 'sentinel announce-hostnames yes' >> /tmp/sentinel.conf &&
+               redis-sentinel /tmp/sentinel.conf"
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    networks:
+      - redis-network
+
+  # Sentinel 3
+  sentinel-3:
+    image: redis:latest
+    container_name: sentinel-3
+    ports:
+      - "26381:26379"
+    command: >
+      bash -c "echo 'port 26379' > /tmp/sentinel.conf &&
+               echo 'dir /tmp' >> /tmp/sentinel.conf &&
+               echo 'sentinel monitor mymaster redis-master 6379 2' >> /tmp/sentinel.conf &&
+               echo 'sentinel down-after-milliseconds mymaster 5000' >> /tmp/sentinel.conf &&
+               echo 'sentinel parallel-syncs mymaster 1' >> /tmp/sentinel.conf &&
+               echo 'sentinel failover-timeout mymaster 10000' >> /tmp/sentinel.conf &&
+               echo 'sentinel resolve-hostnames yes' >> /tmp/sentinel.conf &&
+               echo 'sentinel announce-hostnames yes' >> /tmp/sentinel.conf &&
+               redis-sentinel /tmp/sentinel.conf"
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    networks:
+      - redis-network
 
 networks:
-  weather-network:
+  redis-network:
     driver: bridge
