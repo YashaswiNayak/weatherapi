@@ -7,15 +7,20 @@ spring:
     type: redis
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-
+      sentinel:
+        master: mymaster
+        # Use container names when running INSIDE Docker
+        nodes: sentinel-1:26379,sentinel-2:26379,sentinel-3:26379
+      timeout: 5000ms
 
 # Common configuration for all profiles
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  level:
+    com.yashaswi.weatherapi: DEBUG
+    org.springframework.data.redis: DEBUG
+    io.lettuce: DEBUG
 
 management:
   endpoints:
@@ -35,7 +40,7 @@ weather:
     base-url: https://api.openweathermap.org/data/2.5
     timeout: 10s
     retry-attempts: 3
-    cache:
-      ttl: 12h
-      key-prefix: weather
-      enabled: true
+  cache:
+    ttl: 12h
+    key-prefix: weather
+    enabled: true

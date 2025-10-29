@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("api/weather")
+@RequestMapping("/api/weather")
 @Validated
 @Slf4j
 public class WeatherController {

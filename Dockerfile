@@ -1,5 +1,26 @@
-FROM eclipse-temurin:21-jdk-alpine
+# Multi-stage build for Spring Boot with Gradle
+FROM gradle:8.5-jdk21 AS build
 WORKDIR /app
-COPY build/libs/*.jar app.jar
+
+# Copy gradle files first for better caching
+COPY build.gradle settings.gradle ./
+COPY gradle ./gradle
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN gradle clean build -x test
+
+# Runtime stage
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+
+# Copy the built jar from build stage
+COPY --from=build /app/build/libs/*.jar app.jar
+
+# Expose port
 EXPOSE 8080
+
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
