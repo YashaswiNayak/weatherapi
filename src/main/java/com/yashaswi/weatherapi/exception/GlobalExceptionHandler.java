@@ -61,6 +61,30 @@ public class GlobalExceptionHandler  {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ErrorResponse> handleExternalApiError(ExternalApiException exception,HttpServletRequest req){
+        log.error("External API error: {}",exception.getMessage());
+        ErrorResponse errorResponse=ErrorResponse.builder()
+                .status(HttpStatus.BAD_GATEWAY.value())
+                .error("EXTERNAL_API_ERROR")
+                .message(exception.getMessage())
+                .path(req.getRequestURI())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorResponse);
+    }
+
+    @ExceptionHandler(CacheUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleCacheUnavailable(CacheUnavailableException exception, HttpServletRequest request){
+        log.error("Redis connection error: {}",exception.getMessage());
+        ErrorResponse errorResponse=ErrorResponse.builder()
+                .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                .error("CACHE_UNAVAILABLE")
+                .message("Cache is unavailable "+exception.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericError(
             Exception ex, HttpServletRequest request) {

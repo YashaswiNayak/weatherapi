@@ -1,6 +1,8 @@
 package com.yashaswi.weatherapi.service;
 
 import com.yashaswi.weatherapi.config.WeatherApiProperties;
+import com.yashaswi.weatherapi.exception.ExternalApiException;
+import com.yashaswi.weatherapi.exception.WeatherNotFoundException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
@@ -55,4 +57,48 @@ class WeatherServiceTest {
                 })
                 .verifyComplete();
     }
+    @Test
+    void shouldThrowWeatherNotFoundException_when404() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"message\":\"city not found\"}"));
+
+        StepVerifier.create(weatherService.getWeatherByCity("InvalidCity"))
+                .expectError(WeatherNotFoundException.class)
+                .verify();
+    }
+
+    @Test
+    void shouldThrowExternalApiException_when500() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\":\"Internal Server Error\"}"));
+
+        StepVerifier.create(weatherService.getWeatherByCity("London"))
+                .expectError(ExternalApiException.class)
+                .verify();
+    }
+
+    @Test
+    void shouldThrowExternalApiException_when401() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(401)
+                .setBody("{\"error\":\"Unauthorized\"}"));
+
+        StepVerifier.create(weatherService.getWeatherByCity("London"))
+                .expectError(ExternalApiException.class)
+                .verify();
+    }
+
+    @Test
+    void shouldThrowExternalApiException_when429RateLimited() {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(429)
+                .setBody("{\"error\":\"Rate limit exceeded\"}"));
+
+        StepVerifier.create(weatherService.getWeatherByCity("London"))
+                .expectError(ExternalApiException.class)
+                .verify();
+    }
+
 }

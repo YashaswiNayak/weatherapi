@@ -3,9 +3,12 @@ package com.yashaswi.weatherapi.service;
 import com.yashaswi.weatherapi.config.WeatherApiProperties;
 import com.yashaswi.weatherapi.dtos.OpenWeatherMapResponse;
 import com.yashaswi.weatherapi.dtos.WeatherResponse;
+import com.yashaswi.weatherapi.exception.ExternalApiException;
+import com.yashaswi.weatherapi.exception.CacheUnavailableException;
 import com.yashaswi.weatherapi.exception.WeatherNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -31,9 +34,17 @@ public class WeatherService {
                 .retrieve()
                 .bodyToMono(OpenWeatherMapResponse.class)
                 .map(this::mapToWeatherResponse)
-                .onErrorResume(WebClientResponseException.class, ex -> {
+                .onErrorResume(WebClientResponseException.NotFound.class, ex -> {
                     log.warn("City {} not found in weather API", city);
                     return Mono.error(new WeatherNotFoundException("Weather data not available for city " + city));
+                })
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    log.warn("OpenWeatherMap API error for city {}: {}", city, ex.getStatusCode());
+                    return Mono.error(new ExternalApiException("Upstream weather API error (" + ex.getStatusCode().value() + ") " + ex.getResponseBodyAsString()));
+                })
+                .onErrorResume(RedisConnectionFailureException.class, ex -> {
+                    log.error("Redis unavailable during fetch for city '{}'", city, ex);
+                    return Mono.error(new CacheUnavailableException("Caching currently unavailable. Please try again later."));
                 })
                 .doOnError(ex -> log.error("Error fetching weather for city {}", city, ex));
     }
