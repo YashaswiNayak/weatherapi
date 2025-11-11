@@ -1,4 +1,4 @@
-package com.yashaswi.weatherapi.dtos;
+package com.yashaswi.weatherapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

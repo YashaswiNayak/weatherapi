@@ -1,6 +1,6 @@
 package com.yashaswi.weatherapi.exception;
 
-import com.yashaswi.weatherapi.dtos.ErrorResponse;
+import com.yashaswi.weatherapi.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;

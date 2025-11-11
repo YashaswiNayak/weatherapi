@@ -2,9 +2,10 @@ spring:
 
 weather:
   api:
-    api-key: ${WEATHER_API_KEY:your-dev-api-key-here}  # This reads from .env
+    api-key: ${WEATHER_API_KEY}  # This reads from .env
     timeout: 30s
-    # ... other weather properties
+  cache:
+    ttl:5m
 
 # Logging (if needed)
 logging:

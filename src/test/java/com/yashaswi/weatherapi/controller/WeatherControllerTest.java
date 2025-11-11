@@ -1,16 +1,16 @@
 package com.yashaswi.weatherapi.controller;
 
-import com.yashaswi.weatherapi.dtos.WeatherResponse;
+import com.yashaswi.weatherapi.dto.WeatherResponse;
 import com.yashaswi.weatherapi.exception.CacheUnavailableException;
 import com.yashaswi.weatherapi.exception.ExternalApiException;
 import com.yashaswi.weatherapi.exception.WeatherNotFoundException;
 import com.yashaswi.weatherapi.service.WeatherService;
-import io.lettuce.core.RedisConnectionException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 @AutoConfigureWebTestClient
 class WeatherControllerTest {
 

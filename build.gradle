@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.yashaswi'
 version = '0.0.1-SNAPSHOT'
-description = 'a weather api top learn '
+description = 'A weather API to learn'
 
 java {
     toolchain {
@@ -18,24 +18,6 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-}
-bootRun {
-    sourceResources sourceSets.main
-
-    // Load environment variables from .env file
-    doFirst {
-        def envFile = file('.env')
-        if (envFile.exists()) {
-            envFile.readLines().each { line ->
-                def (key, value) = line.split('=', 2)
-                if (key && value && !key.startsWith('#')) {
-                    environment key.trim(), value.trim()
-                }
-            }
-        }
-    }
-
-    jvmArgs = ['-Dspring.devtools.restart.enabled=true']
 }
 
 repositories {
@@ -60,8 +42,71 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
 }
 
+// ============================================================================
+// Build Performance Configuration
+// ============================================================================
 
+// Configure Java compilation tasks
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
 
-tasks.named('test') {
+    // Incremental compilation (faster subsequent builds)
+    options.incremental = true
+
+    // Fork compilation to separate JVM (isolates compiler memory)
+    options.fork = true
+    options.forkOptions.memoryMaximumSize = '1g'
+}
+
+// Configure test execution
+tasks.test {
     useJUnitPlatform()
+
+    // Test JVM configuration (separate from build daemon)
+    minHeapSize = "512m"
+    maxHeapSize = "1g"
+
+    // Parallel test execution (faster test suites)
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
+    // Test output configuration
+    testLogging {
+        events = ["passed", "skipped", "failed"]  // ✅ Fixed: use assignment
+        exceptionFormat = "full"                  // ✅ Fixed: use assignment
+        showStandardStreams = false
+    }
+}
+
+// Configure bootJar task (Spring Boot 3.x)
+tasks.bootJar {
+    // Layered JARs for optimal Docker caching
+    layered {
+        enabled = true
+    }
+
+    // Note: excludeDevtools is automatic in Spring Boot 3.x
+    // Devtools is automatically excluded from production JARs
+}
+
+// Configure bootRun for local development
+bootRun {
+    sourceResources sourceSets.main
+
+    // Load environment variables from .env file
+    doFirst {
+        def envFile = file('.env')
+        if (envFile.exists()) {
+            envFile.readLines().each { line ->
+                if (!line.trim().isEmpty() && !line.startsWith('#')) {
+                    def parts = line.split('=', 2)
+                    if (parts.length == 2) {
+                        environment parts[0].trim(), parts[1].trim()
+                    }
+                }
+            }
+        }
+    }
+
+    jvmArgs = ['-Dspring.devtools.restart.enabled=true']
 }

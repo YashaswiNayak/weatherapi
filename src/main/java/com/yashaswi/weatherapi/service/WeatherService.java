@@ -1,8 +1,8 @@
 package com.yashaswi.weatherapi.service;
 
 import com.yashaswi.weatherapi.config.WeatherApiProperties;
-import com.yashaswi.weatherapi.dtos.OpenWeatherMapResponse;
-import com.yashaswi.weatherapi.dtos.WeatherResponse;
+import com.yashaswi.weatherapi.dto.OpenWeatherMapResponse;
+import com.yashaswi.weatherapi.dto.WeatherResponse;
 import com.yashaswi.weatherapi.exception.ExternalApiException;
 import com.yashaswi.weatherapi.exception.CacheUnavailableException;
 import com.yashaswi.weatherapi.exception.WeatherNotFoundException;

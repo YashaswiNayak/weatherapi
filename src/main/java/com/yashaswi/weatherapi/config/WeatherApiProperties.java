@@ -1,43 +1,48 @@
 package com.yashaswi.weatherapi.config;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.Duration;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
-@Configuration
+/**
+ * Configuration properties for Weather API integration.
+ * Maps properties from application.yml with prefix "weather.api".
+ */
+@Component
 @ConfigurationProperties(prefix = "weather.api")
+@Validated  // Enables JSR-303 validation
 @Data
-@Validated
 public class WeatherApiProperties {
-    @NotBlank(message = "Weather API key must be configured")
+
+    /**
+     * API key for OpenWeatherMap API.
+     * Must be set via environment variable or application.yml.
+     */
+    @NotBlank(message = "weather.api.api-key must be configured")
     private String apiKey;
-    @NotBlank(message = "Weather API base URL must be configured")
+
+    /**
+     * Base URL for Weather API.
+     * Default: https://api.openweathermap.org/data/2.5
+     */
+    @NotBlank(message = "weather.api.base-url must be configured")
     private String baseUrl = "https://api.openweathermap.org/data/2.5";
-    @NotNull
-    private Duration timeout = Duration.ofSeconds(10);
-    private int retryAttempts = 3;
-    private Cache cache = new Cache();
 
-    @Data
-    public static class Cache {
-        /**
-         * Time-to-live for cached weather data
-         */
-        private Duration ttl = Duration.ofHours(12);
+    /**
+     * Connection timeout in milliseconds.
+     * Default: 5000ms (5 seconds)
+     */
+    @Positive
+    private int connectTimeout = 5000;
 
-        /**
-         * Redis key prefix for weather cache entries
-         */
-        private String keyPrefix = "weather";
-
-        /**
-         * Enable/disable caching
-         */
-        private boolean enabled = true;
-    }
+    /**
+     * Read timeout in milliseconds.
+     * Default: 5000ms (5 seconds)
+     */
+    @Positive
+    private int readTimeout = 5000;
 }

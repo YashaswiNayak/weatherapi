@@ -1,6 +1,6 @@
 package com.yashaswi.weatherapi.controller;
 
-import com.yashaswi.weatherapi.dtos.WeatherResponse;
+import com.yashaswi.weatherapi.dto.WeatherResponse;
 import com.yashaswi.weatherapi.exception.WeatherNotFoundException;
 import com.yashaswi.weatherapi.service.WeatherService;
 import lombok.extern.slf4j.Slf4j;

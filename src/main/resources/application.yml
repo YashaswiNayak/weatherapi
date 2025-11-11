@@ -3,6 +3,8 @@ spring:
     name: weatherapi
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+  config:
+    fail-fast: true
   cache:
     type: redis
   data:

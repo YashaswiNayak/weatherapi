@@ -1,6 +1,6 @@
 package com.yashaswi.weatherapi.exception;
 
-import com.yashaswi.weatherapi.dtos.ErrorResponse;
+import com.yashaswi.weatherapi.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.ConstraintViolationException;

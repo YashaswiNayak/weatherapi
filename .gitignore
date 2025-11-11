@@ -1,12 +1,82 @@
-HELP.md
-.gradle
+# ============================================================================
+# Weather API - Production .gitignore
+# ============================================================================
+# Spring Boot + Gradle + Docker + Redis
+# ============================================================================
+
+# ============================================================================
+# 🔐 Secrets & Environment (NEVER COMMIT!)
+# ============================================================================
 .env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.jks
+secrets/
+
+# Spring Boot help markdown
+HELP.md
+
+# ============================================================================
+# ☕ Gradle Build System
+# ============================================================================
+.gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
+# ============================================================================
+# 📦 Build Artifacts
+# ============================================================================
+# Logs
+*.log
+logs/
+build/logs/
+
+# Heap dumps
+*.hprof
+build/heap-dumps/
+
+# JAR/WAR files
+*.jar
+*.war
+*.nar
+*.ear
+!gradle/wrapper/gradle-wrapper.jar
+
+# Test reports
+build/reports/
+build/test-results/
+build/jacoco/
+
+# ============================================================================
+# 🐳 Docker & Data
+# ============================================================================
+docker/volumes/
+data/
+redis-data/
+prometheus-data/
+grafana-data/
+
+# ============================================================================
+# 💻 IDEs
+# ============================================================================
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### VS Code ###
+.vscode/
+
+### Eclipse/STS ###
 .apt_generated
 .classpath
 .factorypath
@@ -18,15 +88,6 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -34,5 +95,32 @@ out/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
+# ============================================================================
+# 🖥️ Operating Systems
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ============================================================================
+# 🔧 Temporary Files
+# ============================================================================
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+.cache/
+temp/

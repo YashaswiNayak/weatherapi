@@ -2,7 +2,7 @@ package com.yashaswi.weatherapi.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.yashaswi.weatherapi.dtos.WeatherResponse;
+import com.yashaswi.weatherapi.dto.WeatherResponse;
 import io.lettuce.core.ReadFrom;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

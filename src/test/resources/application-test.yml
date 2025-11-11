@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  data:
+    redis:
+          enabled: false
+  cache:
+    type: none
+
+weather:
+  api:
+    api-key: test-api-key-12345  # Dummy key for tests
+    base-url: http://localhost:8080
+
+# Disable Redis for unit tests
