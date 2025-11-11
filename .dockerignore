@@ -1,0 +1,66 @@
+# ============================================================================
+# .dockerignore - Exclude files from Docker build context
+# ============================================================================
+# Speeds up Docker builds by excluding unnecessary files
+# ============================================================================
+
+# Build artifacts
+build/
+target/
+out/
+.gradle/
+*.jar
+*.war
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+build/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Tests (not needed in production image)
+src/test/
+
+# Scripts (not needed in image)
+scripts/
+
+# CI/CD configs
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
