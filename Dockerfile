@@ -1,7 +1,7 @@
 # ============================================================================
 # Multi-Stage Dockerfile for Weather API (Production-Optimized)
 # ============================================================================
-# Leverages Phase 5 layered JARs for 10x faster Docker rebuilds
+# Leverages Phase 5 layered JARs for 10x faster Docker rebuilds, since all the dependencies are cached, it can be fetched from there way faster
 # ============================================================================
 
 # ============================================================================
@@ -32,7 +32,7 @@ COPY --from=dependencies /workspace/app /workspace/app
 # Copy source code
 COPY src src
 
-# Build application with layered JAR (from Phase 5)
+# Build application with layered JAR
 RUN gradle bootJar --no-daemon -x test && \
     java -Djarmode=layertools -jar build/libs/*.jar extract --destination extracted
 
